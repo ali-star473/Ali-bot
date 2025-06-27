@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alibot PRO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121826;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #1a2035;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 2px solid #2a3255;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .login-form {
+            background-color: #1a2035;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .signal-section {
+            display: none;
+            background-color: #1a2035;
+            padding: 20px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ALIBOT PRO</h1>
+        <p>QUOTEX TRADING SIGNALS</p>
+    </div>
+
+    <div class="container">
+        <div class="login-form" id="loginForm">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">LOGIN</button>
+        </div>
+
+        <div class="signal-section" id="signalSection">
+            <h2>USD/BRL (OTC)</h2>
+            <button onclick="getSignal()">GET SIGNAL</button>
+            <p id="nextSignal">Next signal in: <span id="countdown">0:30</span></p>
+            <div id="signalResult"></div>
+        </div>
+    </div>
+
+    <script>
+        // Login function
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if(username === "AliAkbar" && password === "AliAkbar") {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('signalSection').style.display = 'block';
+                startCountdown();
+            } else {
+                alert("Invalid credentials! Use Username: AliAkbar, Password: AliAkbar");
+            }
+        }
+
+        // Signal countdown
+        function startCountdown() {
+            let seconds = 30;
+            const countdownElement = document.getElementById('countdown');
+            
+            const timer = setInterval(() => {
+                seconds--;
+                countdownElement.textContent = `0:${seconds < 10 ? '0' : ''}${seconds}`;
+                
+                if(seconds <= 0) {
+                    clearInterval(timer);
+                    getSignal();
+                    startCountdown();
+                }
+            }, 1000);
+        }
+
+        // Get signal from server
+        async function getSignal() {
+            const response = await fetch('/signal');
+            const signal = await response.json();
+            
+            document.getElementById('signalResult').innerHTML = `
+                <div style="background-color: ${signal.action === 'BUY' ? '#4CAF50' : '#f44336'};
+                            padding: 15px;
+                            margin-top: 15px;
+                            border-radius: 5px;
+                            text-align: center;">
+                    <h3>${signal.pair} - ${signal.action}</h3>
+                    <p>Confidence: ${signal.confidence}</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
